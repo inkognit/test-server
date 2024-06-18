@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "dev",
+      "console": "integratedTerminal",
+      "runtimeExecutable": "npm",
+      "preLaunchTask": "Orders",
+      "postDebugTask": "Remove Docker Mongo",
+      "runtimeArgs": ["run", "start:dev"],
+      "env": {
+        "PORT": "4001",
+        "SECRET": "some_secret_word",
+        "JWT_SECRET": "some_jwt_secret_word",
+        "MONGO_URI": "mongodb://0.0.0.0:27017",
+        "DB_NAME": "delegram-sniper-development",
+        "DB_USER": "admin",
+        "DB_USER_PASS": "123321qwerty"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "dev without image running",
+      "console": "integratedTerminal",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "env": {
+        "PORT": "4001",
+        "SECRET": "some_secret_word",
+        "JWT_SECRET": "some_jwt_secret_word",
+        "MONGO_URI": "mongodb://0.0.0.0:27017",
+        "DB_NAME": "delegram-sniper-development",
+        "DB_USER": "admin",
+        "DB_USER_PASS": "123321qwerty"
+      }
+    }
+  ]
+}
