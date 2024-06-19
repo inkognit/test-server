@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { sign_in_controller, sign_out_controller, sign_up_controller } from '../controllers/auth.controller.js';
 import { session } from '../core/session.middlewares.js';
+import { Auth } from '../services/auth.service.js';
 
 const auth_routes = Router();
+const auth = new Auth();
 
-auth_routes.post('/sign-in', sign_in_controller);
-auth_routes.post('/sign-up', sign_up_controller);
-auth_routes.post('/sign-out', session, sign_out_controller);
+auth_routes.post('/sign-in', auth.signIn);
+auth_routes.post('/sign-up', auth.signUp);
+auth_routes.post('/sign-out', session, auth.signOut);
 
 export default auth_routes;

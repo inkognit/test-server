@@ -1,40 +1,19 @@
+import { UserModel } from '../db/user.entity.js';
+
 class UserService {
   constructor() {
-    // this.prisma = new PrismaClient();
+    // this.userModel = new UserSchema;
   }
 
-  async get_users(data) {
-    // const users = await this.prisma.user.findMany({
-    //   where: {
-    //     name: { contains: data.name, mode: 'insensitive' },
-    //     email: { contains: data.email, mode: 'insensitive' },
-    //   },
-    //   select: {
-    //     id: true,
-    //     first_name: true,
-    //     middle_name: true,
-    //     last_name: true,
-    //     avatar: true,
-    //   },
-    // });
-    // return users;
+  async get_users(query) {
+    const users = await UserModel.find();
+    return users;
   }
 
   async get_user(id) {
-    // const user = await this.prisma.user.findUnique({
-    //   where: { id },
-    //   select: {
-    //     id: true,
-    //     email: true,
-    //     login: true,
-    //     first_name: true,
-    //     middle_name: true,
-    //     last_name: true,
-    //     name: true,
-    //     avatar: true,
-    //   },
-    // });
-    // return user;
+    const user = await UserModel.findById(id);
+    if (!user) throw { message: 'User not found', code: 404 };
+    return user;
   }
 
   async put_user(data) {
