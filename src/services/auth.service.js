@@ -1,12 +1,13 @@
 import argon2 from 'argon2';
+import * as EmailValidator from 'email-validator';
 import jwt from 'jsonwebtoken';
 import { SessionModel } from '../db/session.entity.js';
 import { UserModel } from '../db/user.entity.js';
 
-export class Auth {
+export class AuthService {
   async signIn(data, deviceInfo, ip) {
     const { email } = data;
-    const { password, ...user } = await UserModel.findOne({ $where: { email } });
+    const { password, ...user } = await UserModel.findOne({ email }).select('name email password').lean();
     if (!password) throw { message: 'User not found', code: 404 };
     const salt = Buffer.from(process.env.SALT);
     const secret = Buffer.from(process.env.JWT_SECRET);
@@ -14,8 +15,8 @@ export class Auth {
       salt,
     });
     if (!access) throw { message: 'Нет доступа!' };
-    const access_token = `Bearer ${jwt.sign({ user }, secret, { expiresIn: '1m' })}`;
-    const refresh_token = jwt.sign({ user }, secret, { expiresIn: '2d' });
+    const accessToken = `Bearer ${jwt.sign({ user }, secret, { expiresIn: '1m' })}`;
+    const refreshToken = jwt.sign({ user }, secret, { expiresIn: '2d' });
     await SessionModel.updateMany(
       {
         $and: [{ userId: user._id }, { deviceInfo }, { isUsed: false }],
@@ -25,13 +26,14 @@ export class Auth {
       },
     );
 
-    const newSession = new SessionModel({ accessToken, refreshToken, userId, deviceInfo, ip });
+    const newSession = new SessionModel({ accessToken, refreshToken, userId: user._id, deviceInfo, ip });
     await newSession.save();
-    return { access_token, refresh_token, user };
+    return { accessToken, refreshToken, user };
   }
 
   async signUp(data) {
-    const isExistUser = await UserModel.findOne({ $where: { email: data.email } });
+    console.log('🚀 ~ Auth ~ signUp ~ data.email:', data.email);
+    const isExistUser = await UserModel.findOne({ email: data.email });
     if (isExistUser) throw { message: 'Такой email или login уже используется!' };
     const salt = Buffer.from(process.env.SALT);
     const isCheckPassword = new RegExp('^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9!@#$%^&*-_=]{8,32}$').test(data.password);

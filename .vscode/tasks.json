@@ -9,7 +9,7 @@
     {
       "label": "Start Docker Mongo",
       "type": "shell",
-      "command": "docker run -d -p 27017:27017 --name MongoDB -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=123321qwerty mongo:latest"
+      "command": "docker run -d -p 27017:27017 --name TestDB -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=123321qwerty mongo:latest"
     },
     {
       "label": "Sleep for 5 seconds",
@@ -20,7 +20,7 @@
     {
       "label": "Remove Docker Mongo",
       "type": "shell",
-      "command": "docker rm -f MongoDB"
+      "command": "docker rm -f TestDB"
     }
   ]
 }

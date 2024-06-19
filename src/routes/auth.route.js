@@ -1,9 +1,9 @@
 import { Router } from 'express';
+import { AuthController } from '../controllers/auth.controller.js';
 import { session } from '../core/session.middlewares.js';
-import { Auth } from '../services/auth.service.js';
 
 const auth_routes = Router();
-const auth = new Auth();
+const auth = new AuthController();
 
 auth_routes.post('/sign-in', auth.signIn);
 auth_routes.post('/sign-up', auth.signUp);

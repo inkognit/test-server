@@ -1,47 +1,47 @@
 import jwt from 'jsonwebtoken';
+import { SessionModel } from '../db/session.entity.js';
 import { device_info } from './get-device-info.util.js';
 
 export const session = async (req, res, next) => {
-  //   let prisma = new PrismaClient();
-  let access_token = req.headers['authorization'];
+  let accessToken = req.headers['authorization'];
 
   const secret = Buffer.from(process.env.JWT_SECRET);
-  if (!access_token || !access_token.startsWith('Bearer ')) {
+  if (!accessToken || !accessToken.startsWith('Bearer ')) {
     return res.status(401).send({ message: 'Access Denied. No token provided.' });
   }
 
   try {
-    const { user } = jwt.verify(access_token.substring(7), secret);
+    const { user } = jwt.verify(accessToken.substring(7), secret);
     req.session = user;
     next();
   } catch (error) {
     if (error.name !== 'TokenExpiredError') {
-      //   await prisma.session.update({ where: { user_id: user.id, is_used: false }, data: { is_used: true } });
+      await SessionModel.updateOne({ userId: user.id, isUsed: false }, { isUsed: true });
       return res.status(400).send({ message: 'Invalid Token.' });
     }
-    let { user } = jwt.decode(access_token.substring(7), secret);
+    let { user } = jwt.decode(accessToken.substring(7), secret);
     try {
-      //   const { refresh_token } = await prisma.session.findFirst({
-      // where: { user_id: user.id, device_info: device_info(req.headers['user-agent']), is_used: false },
-      //   });
+      const { refreshToken } = SessionModel.findOne({
+        userId: user.id,
+        deviceInfo: device_info(req.headers['user-agent']),
+        isUsed: false,
+      });
 
-      jwt.verify(refresh_token, secret);
-      access_token = `Bearer ${jwt.sign({ user }, secret, { expiresIn: '15m' })}`;
+      jwt.verify(refreshToken, secret);
+      accessToken = `Bearer ${jwt.sign({ user }, secret, { expiresIn: '15m' })}`;
       req.session = user;
 
       res
-        .cookie('access_token', access_token, { httpOnly: true, secure: true, sameSite: 'strict' })
-        .header('authorization', access_token);
+        .cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'strict' })
+        .header('authorization', accessToken);
       return next();
     } catch (error) {
-      let where = { user_id: user.id, is_used: false };
+      let where = { userId: user.id, isUsed: false };
       if (error.name === 'TokenExpiredError') {
         where['device_info'] = device_info(req.headers['user-agent']);
       }
-      //   await prisma.session.updateMany({
-      //     where,
-      //     data: { is_used: true },
-      //   });
+      await SessionModel.updateMany(where, { isUsed: true });
+
       res.statusMessage = 'Invalid Token.';
       return res.status(400).send('Invalid Token.');
     }
