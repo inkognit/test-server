@@ -11,7 +11,7 @@ class UserService {
   }
 
   async getUser(id) {
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findById(id).lean();
     if (!user) throw { message: 'User not found', code: 404 };
     return user;
   }
@@ -27,10 +27,10 @@ class UserService {
   }
 
   async deleteUser(id) {
-    // const is_check = await this.prisma.user.count({ where: { id } });
-    // if (!is_check) throw { message: 'По данному идентификатору ничего не найдено' };
-    // const user = await this.prisma.user.delete({ where: { id } });
-    // return user;
+    // const user = await UserModel.findById(id).lean();
+    // if (!user) throw { message: 'User not found', code: 404 };
+    await UserModel.findByIdAndDelete({ _id: id });
+    return { message: 'ok' };
   }
 }
 

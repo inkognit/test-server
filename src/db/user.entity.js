@@ -18,6 +18,14 @@ const userSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export const UserModel = mongoose.model('User', userSchema);

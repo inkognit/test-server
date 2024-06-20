@@ -16,13 +16,13 @@ export const session = async (req, res, next) => {
     next();
   } catch (error) {
     if (error.name !== 'TokenExpiredError') {
-      await SessionModel.updateOne({ userId: user.id, isUsed: false }, { isUsed: true });
+      await SessionModel.updateOne({ userId: user._id, isUsed: false }, { isUsed: true });
       return res.status(400).send({ message: 'Invalid Token.' });
     }
     let { user } = jwt.decode(accessToken.substring(7), secret);
     try {
-      const { refreshToken } = SessionModel.findOne({
-        userId: user.id,
+      const { refreshToken } = await SessionModel.findOne({
+        userId: user._id,
         deviceInfo: device_info(req.headers['user-agent']),
         isUsed: false,
       });
@@ -36,12 +36,11 @@ export const session = async (req, res, next) => {
         .header('authorization', accessToken);
       return next();
     } catch (error) {
-      let where = { userId: user.id, isUsed: false };
+      let where = { userId: user._id, isUsed: false };
       if (error.name === 'TokenExpiredError') {
         where['device_info'] = device_info(req.headers['user-agent']);
       }
       await SessionModel.updateMany(where, { isUsed: true });
-
       res.statusMessage = 'Invalid Token.';
       return res.status(400).send('Invalid Token.');
     }
