@@ -1,10 +1,6 @@
 import { UserModel } from '../db/user.entity.js';
 
 class UserService {
-  constructor() {
-    // this.userModel = new UserSchema;
-  }
-
   async getUsers(query) {
     const users = await UserModel.find();
     return users;
@@ -28,7 +24,7 @@ class UserService {
 
   async deleteUser(id) {
     // const user = await UserModel.findById(id).lean();
-    // if (!user) throw { message: 'User not found', code: 404 };
+    // if (!user) throw { message: 'User not found', code: 404 }; // протестировать и далить лишнее после определения эффективности
     await UserModel.findByIdAndDelete({ _id: id });
     return { message: 'ok' };
   }

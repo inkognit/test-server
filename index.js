@@ -46,7 +46,7 @@ db.on('error', console.error.bind(console, 'Ошибка подключения 
 db.once('open', () => {
   console.log('Подключено к базе данных MongoDB');
 });
-app.use('/', routes);
+app.use('/api', routes);
 
 app.listen(PORT, () => {
   console.log('We are live on ' + PORT);

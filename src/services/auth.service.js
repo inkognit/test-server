@@ -35,7 +35,7 @@ export class AuthService {
     console.log('🚀 ~ Auth ~ signUp ~ data.email:', data.email);
     const isExistUser = await UserModel.findOne({ email: data.email });
     if (isExistUser) throw { message: 'Такой email или login уже используется!' };
-    const salt = Buffer.from(process.env.SALT);
+    const salt = Buffer.from(process.env.SALT); // TODO добавить аппарат генерирования персональной соли для повышения безопасности 
     const isCheckPassword = new RegExp('^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9!@#$%^&*-_=]{8,32}$').test(data.password);
     if (!isCheckPassword) {
       throw { message: 'Пароль не соответствует стандартам. Длина 8-32 символа. Буквы латинского алфавита!' };
@@ -49,7 +49,11 @@ export class AuthService {
       email: data.email,
       avatar: data.avatar,
       password,
-      name: data.name,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      middleName: data.middleName,
+      login: data.login,
+      birthday: data.birthday,
     });
     await user.save();
     return { message: 'ok' };
